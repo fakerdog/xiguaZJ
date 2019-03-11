@@ -1,0 +1,303 @@
+// pages/steps/steps.js
+
+const runService = require("../../utils/server.js");
+var ShareUtil = require("../../utils/ShareUtil.js");
+const app = getApp();
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    bannerBg: app.CDN_URL + "steps.png",
+    showScopeModule: false
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function(options) {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面初次渲染完成
+   */
+  onReady: function() {
+
+  },
+
+  //打开设置
+  myopenSetting:function() {
+    console.log("l.....................")
+    var code = this.data.code;
+    var that=this;
+    wx.openSetting({
+      success: res => {
+        if (res.authSetting['scope.werun']) {
+          that.setData({
+            showScopeModule: false
+          })          
+        }
+      }
+    })
+  },
+
+  initStepData: function(code){
+    var that = this;
+    wx.getWeRunData({
+      success: res => {
+        var iv = res.iv;
+        var encryptedData = res.encryptedData;
+        //加载打卡数据，并实现打卡
+        runService.encryptWeRunData(encryptedData, iv, code, res => {
+          var data = res.data.data;
+          //当前月的数据
+          var mystep = parseInt(data.step);
+          app.globalData.stepInfo = {};
+          app.globalData.stepInfo.mystep = mystep;
+          var k = 0.8;
+          var weight = parseInt(65); //kg
+          var height = parseInt(178); //cm
+
+          var stepWidth = height * 0.4 / 100; //步幅，米
+          var caloris = weight * mystep / 1000 * stepWidth * k;
+          var km = (stepWidth * mystep / 1000).toFixed(1); //公里
+          that.setData({
+            mystep: mystep,
+            caloris: caloris.toFixed(1),
+            km: km
+          });
+          that.setData({
+            mystep: mystep
+          });
+          //画图
+          that.drawerStepCanvas();
+        });
+      },
+      fail:res=>{
+        that.setData({
+          showScopeModule:true
+        })
+      }
+    })
+  },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function() {
+    var that = this;
+    wx.login({
+      success: res => {
+        var code = res.code; //code
+        this.initStepData(code);
+      }
+    });
+  },
+
+  //今日步数分享图
+  todayStepShareImg: function(e) {
+    this.setData({
+      showModalStatus: true,
+      hiddenCanvas: true,
+      hiddenStepCanvas: true,
+      userInfo: e.detail.userInfo
+    });
+    wx.showLoading({
+      title: '图片生成中...',
+    });
+    this._drawShareImg();
+  },
+  //画图
+  _drawShareImg: function() {
+    this.setData({
+      hiddenCanvas: false
+    });
+    var destWidth = 1305;
+    var destHeight = 1501;
+    const ctx = wx.createCanvasContext('shareCanvas');
+    ctx.drawImage(app.CDN_URL + 'drawerbgIndex.png', 0, 0, destWidth, destHeight);
+
+    var mystep = this.data.mystep;
+    var caloris = this.data.caloris;
+    var km = this.data.km;
+    var shareObj = ShareUtil.getRateAndLetters(mystep, 1);
+    var shareLetters = ShareUtil.getShareLetters();
+    // console.log(shareLetters);
+    //显示数据
+    var month = this.data.month;
+
+
+    //数据
+    ctx.setFontSize(80);
+    ctx.setFillStyle("#141414");
+    ctx.textAlign = 'center';
+    ctx.fillText(this.data.userInfo.nickName, 645, 120);
+
+    ctx.setFillStyle("#408b51");
+    ctx.fillText(shareObj.rate + "%", 825, 250); //排行
+
+    ctx.setFontSize(60);
+    ctx.setFillStyle("#141414");
+    ctx.fillText("今日步数超过了全国               的网友", 645, 240);
+
+    ctx.setFontSize(48);
+    ctx.fillText("运动" + km + "公里，消耗" + caloris + "卡路里", 645, 930);
+
+    if (shareLetters) {
+      ctx.setFontSize(60);
+      ctx.setFillStyle("#408b51");
+      ctx.fillText(shareLetters[0], 645, 1150);
+      ctx.fillText(shareLetters[1], 645, 1250);
+    }
+
+    ctx.setFontSize(150);
+    ctx.textAlign = 'center';
+    ctx.fillText(mystep, 660, 670); //步数
+
+    //图片显示
+    var that = this;
+    ctx.draw(true, res => {
+      wx.canvasToTempFilePath({
+        destWidth: destWidth,
+        destHeight: destHeight,
+        width: destWidth,
+        height: destHeight,
+        canvasId: 'shareCanvas',
+        success: function(res) {
+          that.setData({
+            showModalStatus: true,
+            hiddenCanvas: true,
+            hiddenStepCanvas: true,
+            imagePath: res.tempFilePath,
+          });
+        },
+        complete: function(res) {
+          //图片生成完成
+          wx.hideLoading();
+        }
+      });
+    });
+  },
+  /**
+   * 保存图片
+   */
+  saveImg: function() {
+    var filePath = this.data.imagePath;
+    wx.saveImageToPhotosAlbum({
+      filePath: filePath,
+      success: res => {
+        wx.showToast({
+          title: '已保存到相册',
+          icon: 'success',
+          duration: 2000
+        });
+        this.setData({
+          showModalStatus: false,
+          hiddenCanvas: true,
+          hiddenStepCanvas: false
+        });
+      }
+    });
+  },
+
+  /**
+   * 保存图片
+   */
+  cancel: function() {
+    this.setData({
+      showModalStatus: false,
+      hiddenCanvas: true,
+      hiddenStepCanvas: false
+    });
+  },
+  /**
+   * 生命周期函数--监听页面隐藏
+   */
+  onHide: function() {
+
+  },
+  /**
+   * 根据步数画图
+   */
+  drawerStepCanvas: function() {
+    var winWidth = wx.getSystemInfoSync().windowWidth;
+    ////创建并返回绘图上下文context对象
+    var cxt_arc = wx.createCanvasContext('canvasArc');
+    cxt_arc.beginPath();
+
+    //计时器
+    this.clearTimeInterval(); //清除计时器
+    var mystep = this.data.mystep;
+    var that = this;
+    var minPercent = Math.PI * 0.5;
+    var maxPercent = Math.PI * (0.5 + (mystep / 10000) * 2);
+    if (maxPercent > Math.PI * 2.5) {
+      maxPercent = Math.PI * 2.5;
+    }
+    var curPercent = minPercent;
+    var inter_id = setInterval(function() {
+      if (curPercent >= maxPercent) {
+        that.clearTimeInterval();
+        that.setData({
+          // scaletitle:"scale-title-cls",
+          scalecls: "scale-cls"
+        });
+      } else {
+        curPercent += 0.1;
+        cxt_arc.setStrokeStyle('#40d07f');
+        cxt_arc.setLineWidth(7);
+        cxt_arc.setLineCap('round')
+        cxt_arc.arc(105, 100, 88, minPercent, curPercent, false);
+        cxt_arc.stroke();
+        cxt_arc.draw();
+      }
+    }, 30);
+    app.globalData.time_inter_ids.push(inter_id); //计时器数组
+
+  },
+  //清除所有计时器
+  clearTimeInterval: function() {
+    var ids = app.globalData.time_inter_ids;
+    if (ids && ids.length > 0) {
+      for (var i = 0; i < ids.length; i++) {
+        clearInterval(ids[i]);
+      }
+    }
+    app.globalData.time_inter_ids = [];
+  },
+  /**
+   * 生命周期函数--监听页面卸载
+   */
+  onUnload: function() {
+
+  },
+
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh: function() {
+
+  },
+
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom: function() {
+
+  },
+
+  /**
+   * 用户点击右上角分享
+   */
+  onShareAppMessage: function() {
+    return {
+      title: "我已经领了红包，你也快去领吧！",
+      path: "/pages/index/index",
+      success: res => {
+
+      }
+    }
+  }
+})

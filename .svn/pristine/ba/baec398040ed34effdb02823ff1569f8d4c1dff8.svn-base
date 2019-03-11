@@ -1,0 +1,38 @@
+
+
+<view class='container'>
+  <view class="title" style='margin-top:50px;'>
+  中国<text>34</text>个省，<text>660</text>个城市
+  </view>
+  <view class="title" style="margin-top:10px;">你去过多少？</view>
+  <image class="chinamap" src='../../images/chinamap.png' mode='aspectMode'></image>
+  
+  <form bindsubmit="formSubmit"  report-submit="true" style='width:100%;margin-top:-70px;'>
+    <button class="start-btn" form-type="submit" type='primary'>开  始</button>
+  </form>
+
+  <button wx:if="{{moreObj}}" class="start-btn" bindtap='tomore' type='warn' style='margin-top:5px;'>更多好玩</button>
+
+  <view wx:if="{{bannerObj}}" class="banner-view">
+  <image bindtap='tobanner' src='{{bannerObj.image}}' style='height:100px; ' mode="aspectFit"></image>
+  </view>
+  
+</view>
+
+<view class="promotion-view" wx:if="{{showPromotion && promotionObj}}">
+  <view style='margin-left:10px; width:90%;font-size:14px;' bindtap='topromotion'>{{promotionObj.desc}}</view>
+  <view style='width:10%;text-align:center;' bindtap='doclose'>x</view>
+</view>
+
+<view class="tu-block" >
+  <block wx:if="{{randObj}}">
+      <image bindtap='torand' class="tu-block-image" src="{{randObj.image}}" mode="aspectFit"></image>
+  </block>  
+</view>
+
+<view wx:if="{{contactObj}}" class="message-tu">
+  <button open-type='contact' class="message-tu-button">
+    <image class="message-tu-image" src="{{contactObj.image}}" mode="aspectFit"></image>
+  </button>
+</view>
+

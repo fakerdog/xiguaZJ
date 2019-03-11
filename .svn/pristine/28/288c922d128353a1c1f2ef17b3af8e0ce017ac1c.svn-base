@@ -1,0 +1,16 @@
+{
+  "pages": [
+    "pages/steps/steps",
+    "pages/index/index",
+    "pages/logs/logs",
+    "pages/zuji/zuji",
+    "pages/cavs/cavs",
+    "pages/promotion/promotion"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "西瓜足迹",
+    "navigationBarTextStyle": "black"
+  }
+}

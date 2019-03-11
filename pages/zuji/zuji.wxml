@@ -1,0 +1,66 @@
+
+<block wx:if="{{showModalStatus}}">
+  <!-- 图片 -->
+  <view class="drawer_content_box" wx:if="{{showModalStatus}}" >
+    <view class="drawer_content">
+        <image src='{{imagePath}}' style='width:100%;height:{{screenHeight}}px;'>
+        </image>        
+    </view>
+
+    <view wx:if="{{shareObj}}" class="share-view">
+      <image bindtap='toshare' class="tu-block-image" src="{{shareObj.image}}" mode="aspectFit"></image>
+    </view>
+
+    <view class="drawer_btn_block">
+        <button class="save-img" open-type='share'>
+        <image class="btn-img" src="../../images/share.png" mode='aspectFit'></image>
+        转发到群
+        </button>
+
+        <button class="save-img" bindtap='saveImg'>
+        <image class="btn-img" src="../../images/friend.png" mode='aspectFit'></image>
+        生成图片分享好友
+        </button>
+        
+        <button class="save-img" bindtap='doCancel'>
+        <image class="btn-img" src="../../images/refresh.png" mode='aspectFit'></image>
+        <text style='color:#494848'>重选</text>
+        </button>
+    </view>
+  </view>
+
+</block>
+<block wx:else>
+  <view class='container'>
+    <scroll-view  class="left-container" scroll-y="true" style="height: {{myheight}}px">
+      <view bindtap='provinceClick' data-d='{{item.id}}' class="{{item.cls}}" wx:for="{{province}}" wx:item="item" wx:key="key">
+        {{item.name}}
+        <view class="count-view"><view class="count-view-cur" wx:if="{{item.count > 0}}">{{item.count}}</view></view>
+      </view>
+    </scroll-view >
+
+  <view>
+      <scroll-view scroll-y="true" style='height: {{myheight-70}}px;'>
+        <view  class="right-container">
+        <view bindtap='cityClick'  data-d='{{item.id}}' data-p='{{item.pid}}' class="{{item.cls}}" wx:for="{{city}}" wx:item="item" wx:key="key">{{item.name}}</view>
+        </view>
+      </scroll-view>
+
+      <view class="right-footer">
+        <button class='submit-btn' bindgetuserinfo='doSubmit' type='primary' open-type="getUserInfo">提 交</button>
+      </view>
+    </view>
+    
+  </view>
+</block>
+
+<block wx:if="{{iphone}}">
+    <canvas class="drawer_content_canvas {{hiddenCanvas?'hidden-view':''}}" canvas-id="shareCanvas" >
+    </canvas>
+</block>
+<block wx:else>
+    <canvas class="drawer_content_canvas" canvas-id="shareCanvas" >
+    </canvas>
+</block>
+
+

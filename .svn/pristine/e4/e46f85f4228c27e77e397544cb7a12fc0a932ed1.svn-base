@@ -1,0 +1,78 @@
+
+<view  class='banner-view'  style='background:url({{bannerBg}}) no-repeat; background-size:100% 100%;'>
+</view>
+
+<view class="container">
+  <canvas disable-scroll="true" bindtouchmove="touchmove" class="mystep-canvas  {{hiddenStepCanvas?'hidden-view':''}}" canvas-id="canvasArc">  
+      <view class="container">
+        <view class="mystep-block">
+          <view class="today-step-title {{scaletitle}}">今日步数</view>
+          <view class="today-step-num {{scalecls}}">{{mystep}}</view>
+          <view class="today-step">目标一万步</view>
+        </view>
+      </view>
+  </canvas>
+</view>
+
+<!-- 今日数据栏 -->
+<view class='mystep-data-block'>
+  <view class="data-run-block mr-5">
+    <image src='../../images/run.png'></image>
+  </view>
+  <view class="data-item-block mr-5">
+    <view class="data-item-title">{{km}}公里</view>
+  </view>
+  <view class="data-item-block">
+    <view class="data-item-title">{{caloris}}卡路里</view>
+  </view>
+</view>
+
+<view class='mystep-uploadbtn-block'>
+  <view>
+  <!-- <view class="mystep-reddoc"></view> -->
+  <!-- <button  class='mystep-homebtn'  hover-class='btn-hover' open-type="getUserInfo" bindgetuserinfo='tohomestep' >我的{{mymonth}}月步数</button> -->
+  <button style='height:35px;line-height:35px;font-size:16px;background:#EF706A' type='warn' open-type="getUserInfo" bindgetuserinfo='todayStepShareImg'>今日步数分享图</button>
+  </view>
+  
+<view class='mystep-homebtn-desc'>记录我的每天每月每年步数</view>
+  <view class="mystep-share-block">
+    <button open-type='share' style='height:35px;line-height:35px;font-size:16px;background-color:#CCC;' >分享给群好友</button>
+    
+  </view>
+  
+</view>
+
+
+<!-- 弹出层 -->
+<view  class="drawer_screen" catchtouchmove="true" wx:if="{{showModalStatus}}">
+</view>
+<view class="drawer_box" catchtouchmove="true" wx:if="{{showModalStatus}}" >  
+  <view class="drawer_content_box" >
+    <view class="drawer_content">
+        <image src='{{imagePath}}' mode='aspectFit'>
+        </image>          
+    </view>
+
+    <view class="drawer_btn_block">
+        <button class="save-img" bindtap='saveImg' >保存图片，分享朋友圈</button>
+        <button bindtap='cancel'>取 消</button>
+    </view>
+
+  </view>
+</view>
+  
+<block wx:if="{{iphone}}">
+    <canvas class="drawer_content_canvas {{hiddenCanvas?'hidden-view':''}}" canvas-id="shareCanvas" mode='aspectFit'>
+  </canvas>
+</block>
+<block wx:else>
+    <canvas class="drawer_content_canvas_abs" canvas-id="shareCanvas" >
+    </canvas>
+</block>
+
+<view class='mask' wx:if="{{showScopeModule}}">
+  <view wx:if="{{showScopeModule}}" class='scopeModule'>
+    <view class="scopeTitle">打开微信运动授权，开始获取步数</view>
+    <view class="scope-confirm" bindtap='openSetting'>确定</view>
+  </view>
+</view>

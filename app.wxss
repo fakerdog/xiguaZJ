@@ -1,0 +1,24 @@
+/**app.wxss   CSS **/
+Page{
+  /* background: linear-gradient(#062a31, #4f93a1); 
+   */
+   background:white;
+}
+.container {
+  height: 100%;
+  display: flex; 
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 10px;
+  box-sizing: border-box;
+} 
+.trans-btn{
+  padding: 0px;
+  background-color: transparent;
+}
+.trans-btn::after{
+  border: none;
+}
+
+
