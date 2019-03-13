@@ -8,7 +8,7 @@ App({
   //HTTP_SERVER: "http://localhost:8080/ocWechat/",
   // HTTP_SERVER: "https://www.weixinpy.com/",
   // HTTP_SERVER: "http://192.168.2.196:8080/xgApp/",
-  HTTP_SERVER: "https://tscapp.xiguazuji.com/xgApp/",
+  // HTTP_SERVER: "https://tscapp.xiguazuji.com/xgApp/",
 
   CDN_URL: "https://zuji.weixinpy.com/luckyDraw/",
   onLaunch: function () {
